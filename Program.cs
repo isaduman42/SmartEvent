@@ -3,13 +3,11 @@ using SmartEvent.API.Data;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
-var firebaseApp = FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile("firebase-key.json")
-}
-);
-
 var builder = WebApplication.CreateBuilder(args);
+
+// Render port ayarı
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
 
 // CORS
 builder.Services.AddCors(options =>
@@ -32,6 +30,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+// Firebase başlatma (dosya artık mevcut)
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("firebase-key.json")
+});
 
 // Middleware
 if (app.Environment.IsDevelopment())
