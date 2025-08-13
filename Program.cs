@@ -31,11 +31,22 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Firebase başlatma (dosya artık mevcut)
-FirebaseApp.Create(new AppOptions()
+try
 {
-    Credential = GoogleCredential.FromFile("firebase-key.json")
-});
+    var credential = GoogleCredential.FromFile("firebase-key.json");
+    Console.WriteLine("✅ Firebase credential loaded.");
+
+    FirebaseApp.Create(new AppOptions()
+    {
+        Credential = credential
+    });
+    Console.WriteLine("✅ Firebase initialized successfully.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("❌ Firebase init failed:");
+    Console.WriteLine(ex.ToString()); // Tüm stack trace'i yaz
+}
 
 // Middleware
 if (app.Environment.IsDevelopment())
