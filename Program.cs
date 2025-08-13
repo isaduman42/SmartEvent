@@ -5,7 +5,7 @@ using Google.Apis.Auth.OAuth2;
 
 var firebaseApp = FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile("Secrets/firebase-key.json")
+    Credential = GoogleCredential.FromFile("firebase-key.json")
 }
 );
 
