@@ -37,12 +37,10 @@ FirebaseApp.Create(new AppOptions()
     Credential = GoogleCredential.FromFile("firebase-key.json")
 });
 
-// Middleware
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseCors("AllowAll");
 
