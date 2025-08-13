@@ -29,7 +29,6 @@ Firebase Token Doğrulama
 | Token Alma (Flutter) | FirebaseAuth.instance.currentUser?.getIdToken() |
 | Başarılı Response | { "uid": "firebase-uid" } |
 | Hatalı Response | { "error": "Firebase ID token has expired" } |
-| Test Örneği (Flutter) | http.post(Uri.parse('[https://your-backend.com/api/auth/verify-token](https://your-backend.com/api/auth/verify-token)'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(idToken)); |
 
 Event Endpoints
 
