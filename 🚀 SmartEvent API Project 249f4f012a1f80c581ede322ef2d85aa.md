@@ -15,6 +15,10 @@
 
 ### 🌐 API Endpoints
 
+Base Url:https://smartevent.onrender.com
+
+Swagger: https://smartevent.onrender.com/swagger/index.html
+
 Firebase Token Doğrulama
 
 | Alan | Değer |
