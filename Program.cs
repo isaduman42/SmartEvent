@@ -45,6 +45,5 @@ app.UseSwaggerUI();
 app.UseCors("AllowAll");
 
 app.MapControllers(); 
-app.MapGet("/", () => Results.Ok("SmartEvent backend is live!"));
 
 app.Run();
