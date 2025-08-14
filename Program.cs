@@ -27,11 +27,11 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-//var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json");
-//FirebaseApp.Create(new AppOptions()
-//{
-    //Credential = GoogleCredential.FromFile(firebasePath)
-//});
+var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json");
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile(firebasePath)
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();
