@@ -5,11 +5,9 @@ using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render port ayarı
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -20,30 +18,29 @@ builder.Services.AddCors(options =>
     });
 });
 
-// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Firebase başlatma (dosya artık mevcut)
-FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile("firebase-key.json")
-});
-
+//var firebasePath = Path.Combine(Directory.GetCurrentDirectory(), "firebase-key.json");
+//FirebaseApp.Create(new AppOptions()
+//{
+    //Credential = GoogleCredential.FromFile(firebasePath)
+//});
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseCors("AllowAll");
 
-app.MapControllers(); 
+app.UseRouting();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
