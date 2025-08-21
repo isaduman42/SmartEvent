@@ -1,4 +1,4 @@
-namespace SmartEvent.Models;
+namespace SmartEvent.API.Models;
 
 public class Event
 {

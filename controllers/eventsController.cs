@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartEvent.API.Data;
-using SmartEvent.Models;
+using SmartEvent.API.Models;
 
 namespace SmartEvent.API.Controllers
 {

@@ -1,4 +1,6 @@
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartEvent.API.Models;
 
 namespace SmartEvent.API.Controllers
@@ -7,55 +9,92 @@ namespace SmartEvent.API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private static List<User> users = new List<User>();
+        private readonly AppDbContext _dbContext;
 
-        // CREATE
-        [HttpPost]
-        public IActionResult CreateUser([FromBody] User user)
+        public UserController(AppDbContext dbContext)
         {
-            user.Id = Guid.NewGuid().ToString();  
-            users.Add(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            _dbContext = dbContext;
+        }
+
+        // CREATE - Firebase Auth ile
+        [HttpPost("firebase")]
+        public async Task<IActionResult> CreateUserFromFirebase([FromBody] FirebaseAuthRequest request)
+        {
+            try
+            {
+                var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(request.IdToken);
+                var uid = decodedToken.Uid;
+
+                var userRecord = await FirebaseAuth.DefaultInstance.GetUserAsync(uid);
+
+                var existingUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == uid);
+                if (existingUser != null)
+                {
+                    return Ok(new { message = "Kullanıcı zaten kayıtlı", user = existingUser });
+                }
+
+                var newUser = new User
+                {
+                    Id = uid,
+                    Name = userRecord.DisplayName ?? "Anonim",
+                    Email = userRecord.Email ?? "unknown@email.com",
+                    Role = "user"
+                };
+
+                _dbContext.Users.Add(newUser);
+                await _dbContext.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(401, $"Firebase doğrulama hatası: {ex.Message}");
+            }
         }
 
         // READ - All
         [HttpGet]
-        public IActionResult GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
+            var users = await _dbContext.Users.ToListAsync();
             return Ok(users);
         }
 
         // READ - By ID
         [HttpGet("{id}")]
-        public IActionResult GetUserById(string id)
+        public async Task<IActionResult> GetUserById(string id)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.FindAsync(id);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
         // UPDATE
         [HttpPut("{id}")]
-        public IActionResult UpdateUser(string id, [FromBody] User updatedUser)
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.FindAsync(id);
             if (user == null) return NotFound();
 
             user.Name = updatedUser.Name;
             user.Email = updatedUser.Email;
             user.Role = updatedUser.Role;
+
+            await _dbContext.SaveChangesAsync();
             return NoContent();
         }
 
         // DELETE
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser(string id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = users.FirstOrDefault(u => u.Id == id);
+            var user = await _dbContext.Users.FindAsync(id);
             if (user == null) return NotFound();
 
-            users.Remove(user);
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync();
             return NoContent();
         }
     }
+
 }
